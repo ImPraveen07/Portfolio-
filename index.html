@@ -1,80 +1,49 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-<title>HiHi Web App</title>
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>HiHi Web App</title>
 
-<!-- App theme color -->
-<meta name="theme-color" content="#ffffff">
+  <meta name="theme-color" content="#ffffff">
 
-<style>
-  body {
-    font-family: Arial, sans-serif;
-    text-align: center;
-    margin-top: 140px;
-  }
-  h1 {
-    font-size: 48px;
-  }
-  p {
-    opacity: 0.7;
-    font-size: 20px;
-  }
-</style>
+  <!-- LINK TO MANIFEST -->
+  <link rel="manifest" href="manifest.json">
+
+  <!-- iOS support -->
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <link rel="apple-touch-icon" href="icons/icon-192.png">
+
+  <style>
+    body {
+      font-family: sans-serif;
+      text-align: center;
+      margin-top: 120px;
+    }
+    h1 {
+      font-size: 48px;
+      margin-bottom: 10px;
+    }
+    p {
+      opacity: 0.7;
+      font-size: 20px;
+    }
+  </style>
 </head>
 <body>
 
-<h1>HiHi Web</h1>
-<p>This is a full PWA inside ONE HTML file.</p>
+  <h1>HiHi Web</h1>
+  <p>Your PWA is working perfectly.</p>
 
-<script>
-/* ------------------------------------------
-   1️⃣ CREATE MANIFEST INSIDE HTML
--------------------------------------------*/
-const manifest = {
-  name: "HiHi Web",
-  short_name: "HiHi",
-  start_url: ".",
-  display: "standalone",
-  background_color: "#ffffff",
-  theme_color: "#ffffff",
-  icons: [
-    {
-      src: "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAMAAAADACAIAAAAiVQ9NAAAABGdBTUEAALGPC/xhBQAAACBjSFJNAAB6JgAAgIQAAPoAAACA6AAAdTAAAOpgAAA6mAAAF3CculE8AAAAx0lEQVR42u3QQQqAIBAEQdP+/7+hAy0mQZmZvkPfuvBHQAAAAAAAAAAACAjpQbWSurR5Xrb1nlQoXIRoE6ZiS/ZdEygOB/BiW7r9jK8zRXp8xGkphMgTIDqZogkCA6kaIMAgOpmgCQIDqZogkCA6kaIMAgOpmgCQIDqZogkCA6kaIMAgOpmgCQIDqZogkCA6kaIMAgOpmgCQIDqZogkCA6kaIMAgOpmgCQIDqZogkCA6kaIMAgOppDnJwvRD2vB0AAAAAAAAAAADwAPIB9uT6aCIFAAAAAElFTkSuQmCC",
-      sizes: "192x192",
-      type: "image/png"
+  <script>
+    // Register Service Worker
+    if ("serviceWorker" in navigator) {
+      navigator.serviceWorker.register("/sw.js")
+        .then(() => console.log("SW Registered"))
+        .catch(err => console.log("SW Error", err));
     }
-  ]
-};
-
-// Convert manifest JSON → Blob URL
-const manifestBlob = new Blob([JSON.stringify(manifest)], { type: 'application/json' });
-const manifestURL = URL.createObjectURL(manifestBlob);
-
-// Attach manifest dynamically
-const manifestLink = document.createElement("link");
-manifestLink.rel = "manifest";
-manifestLink.href = manifestURL;
-document.head.appendChild(manifestLink);
-
-
-/* ------------------------------------------
-   2️⃣ CREATE SERVICE WORKER INSIDE HTML
--------------------------------------------*/
-const swCode = `
-  self.addEventListener("install", e => self.skipWaiting());
-  self.addEventListener("fetch", () => {});
-`;
-
-// Convert SW string → Blob URL
-const swBlob = new Blob([swCode], { type: "text/javascript" });
-const swURL = URL.createObjectURL(swBlob);
-
-// Register service worker
-if ("serviceWorker" in navigator) {
-  navigator.serviceWorker.register(swURL);
-}
-</script>
+  </script>
 
 </body>
 </html>
