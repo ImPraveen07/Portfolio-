@@ -1,124 +1,80 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>ToYou ❤️</title>
+<title>HiHi Web App</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <meta name="theme-color" content="#ffffff">
+<!-- App theme color -->
+<meta name="theme-color" content="#ffffff">
 
-  <!-- iOS PWA Support -->
-  <meta name="apple-mobile-web-app-capable" content="yes" />
-  <meta name="apple-mobile-web-app-status-bar-style" content="default" />
-  <meta name="apple-mobile-web-app-title" content="ToYou ❤️" />
-  <link rel="apple-touch-icon" href="icon.png" />
-
-  <!-- Manifest -->
-  <link rel="manifest" href="manifest.json">
-
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      text-align: center;
-      margin-top: 80px;
-      background: #fff;
-    }
-
-    .header {
-      font-size: 32px;
-      font-weight: bold;
-      color: #111;
-    }
-
-    .message {
-      margin-top: 15px;
-      font-size: 18px;
-      color: #444;
-      max-width: 600px;
-      margin-left: auto;
-      margin-right: auto;
-    }
-
-    /* Install Box */
-    #installBox {
-      display: none;
-      position: fixed;
-      bottom: 18px;
-      left: 50%;
-      transform: translateX(-50%);
-      background: #111;
-      color: white;
-      padding: 14px 20px;
-      border-radius: 14px;
-      font-size: 16px;
-      box-shadow: 0 3px 10px rgba(0,0,0,0.2);
-    }
-
-    #installBtn {
-      margin-left: 10px;
-      background: white;
-      color: #111;
-      padding: 8px 14px;
-      border-radius: 10px;
-      border: none;
-      font-weight: bold;
-      cursor: pointer;
-    }
-  </style>
+<style>
+  body {
+    font-family: Arial, sans-serif;
+    text-align: center;
+    margin-top: 140px;
+  }
+  h1 {
+    font-size: 48px;
+  }
+  p {
+    opacity: 0.7;
+    font-size: 20px;
+  }
+</style>
 </head>
-
 <body>
 
-  <div class="header">ToYou ❤️</div>
-  <div class="message">
-    Anonymous messages made simple. This demo is a fully working PWA.
-  </div>
+<h1>HiHi Web</h1>
+<p>This is a full PWA inside ONE HTML file.</p>
 
-  <!-- Install Prompt Box -->
-  <div id="installBox">
-    Install ToYou?
-    <button id="installBtn">Install</button>
-  </div>
-
-  <script>
-    /* Register service worker */
-    if ("serviceWorker" in navigator) {
-      navigator.serviceWorker.register("./sw.js")
-        .then(() => console.log("✔ Service Worker registered"))
-        .catch(err => console.log("SW error:", err));
+<script>
+/* ------------------------------------------
+   1️⃣ CREATE MANIFEST INSIDE HTML
+-------------------------------------------*/
+const manifest = {
+  name: "HiHi Web",
+  short_name: "HiHi",
+  start_url: ".",
+  display: "standalone",
+  background_color: "#ffffff",
+  theme_color: "#ffffff",
+  icons: [
+    {
+      src: "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAMAAAADACAIAAAAiVQ9NAAAABGdBTUEAALGPC/xhBQAAACBjSFJNAAB6JgAAgIQAAPoAAACA6AAAdTAAAOpgAAA6mAAAF3CculE8AAAAx0lEQVR42u3QQQqAIBAEQdP+/7+hAy0mQZmZvkPfuvBHQAAAAAAAAAAACAjpQbWSurR5Xrb1nlQoXIRoE6ZiS/ZdEygOB/BiW7r9jK8zRXp8xGkphMgTIDqZogkCA6kaIMAgOpmgCQIDqZogkCA6kaIMAgOpmgCQIDqZogkCA6kaIMAgOpmgCQIDqZogkCA6kaIMAgOpmgCQIDqZogkCA6kaIMAgOpmgCQIDqZogkCA6kaIMAgOppDnJwvRD2vB0AAAAAAAAAAADwAPIB9uT6aCIFAAAAAElFTkSuQmCC",
+      sizes: "192x192",
+      type: "image/png"
     }
+  ]
+};
 
-    /* Custom install banner logic */
-    let deferredPrompt;
-    const box = document.getElementById("installBox");
-    const btn = document.getElementById("installBtn");
+// Convert manifest JSON → Blob URL
+const manifestBlob = new Blob([JSON.stringify(manifest)], { type: 'application/json' });
+const manifestURL = URL.createObjectURL(manifestBlob);
 
-    window.addEventListener("beforeinstallprompt", (e) => {
-      e.preventDefault();
-      deferredPrompt = e;
-      console.log("✔ PWA install available");
+// Attach manifest dynamically
+const manifestLink = document.createElement("link");
+manifestLink.rel = "manifest";
+manifestLink.href = manifestURL;
+document.head.appendChild(manifestLink);
 
-      // Show bottom box
-      box.style.display = "block";
-    });
 
-    btn.addEventListener("click", async () => {
-      box.style.display = "none";
-      deferredPrompt.prompt();
-      const result = await deferredPrompt.userChoice;
-      console.log("User choice:", result.outcome);
-      deferredPrompt = null;
-    });
+/* ------------------------------------------
+   2️⃣ CREATE SERVICE WORKER INSIDE HTML
+-------------------------------------------*/
+const swCode = `
+  self.addEventListener("install", e => self.skipWaiting());
+  self.addEventListener("fetch", () => {});
+`;
 
-    /* iOS install tip */
-    const isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent);
-    const isStandalone = window.navigator.standalone === true;
-    if (isIOS && !isStandalone) {
-      setTimeout(() => {
-        alert("👉 To install: Tap Share → Add to Home Screen");
-      }, 2000);
-    }
-  </script>
+// Convert SW string → Blob URL
+const swBlob = new Blob([swCode], { type: "text/javascript" });
+const swURL = URL.createObjectURL(swBlob);
+
+// Register service worker
+if ("serviceWorker" in navigator) {
+  navigator.serviceWorker.register(swURL);
+}
+</script>
 
 </body>
 </html>
